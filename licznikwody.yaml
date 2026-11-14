@@ -1,0 +1,91 @@
+esphome:
+  name: licznikwody
+  friendly_name: LicznikWody
+
+esp32:
+  variant: esp32
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: "Ng+ax0lUDPo4K3J94GJwUo2UEjhcul8y+wZX2X/KjZI="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: LicznikWody Fallback Hotspot
+    password: "3ik2evG3jlcz"
+
+captive_portal:
+
+time:
+  - platform: sntp
+    id: time_sntp
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/VolBog/esphome-wmbus-cc1101-izarv2.git
+    refresh: 0d
+    components:
+      - wmbus_common
+      - wmbus_radio
+      - wmbus_meter
+
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+wmbus_radio:
+  radio_type: CC1101
+  cs_pin: GPIO15
+  dio1_pin: GPIO4
+  frequency: 868.950MHz
+
+  on_frame:
+    - then:
+        - logger.log:
+            format: "WM-BUS FRAME: RSSI=%d dBm, MODE=%s, DATA=%s"
+            args:
+              - "frame->rssi()"
+              - "toString(frame->link_mode())"
+              - "frame->as_hex().c_str()"
+
+wmbus_common:
+  drivers:
+    - izarv2
+
+wmbus_meter:
+  - id: water_meter
+    meter_id: 0x217e4d4f
+    type: izarv2
+
+sensor:
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: total_m3
+    name: "ZimnaWoda"
+    accuracy_decimals: 3
+    unit_of_measurement: "m³"
+    device_class: water
+    state_class: total_increasing
+    icon: mdi:water
+  - platform: wmbus_meter
+    parent_id: water_meter
+    field: rssi_dbm
+    name: "ZimnaWoda RSSI"
+    accuracy_decimals: 0
+    unit_of_measurement: "dBm"
+    device_class: signal_strength
+    state_class: measurement
+    entity_category: diagnostic

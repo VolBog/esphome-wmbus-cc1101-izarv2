@@ -60,7 +60,7 @@ void CC1101::setup() {
   this->write_register(CC1101_FSCTRL0, 0x00);
 
   ESP_LOGVV(TAG, "setting radio frequency");
-  uint32_t freq_reg = ((uint64_t)this->frequency_hz_ << 16) / F_XTAL;
+  uint32_t freq_reg = ((uint64_t) this->frequency_hz_ << 16) / F_XTAL;
   this->write_register(CC1101_FREQ2, byte(freq_reg, 2));
   this->write_register(CC1101_FREQ1, byte(freq_reg, 1));
   this->write_register(CC1101_FREQ0, byte(freq_reg, 0));
@@ -173,11 +173,11 @@ int8_t CC1101::get_rssi() {
   int8_t rssi_offset = (this->frequency_hz_ < 600000000u) ? 76 : 74;
   int16_t rssi_dbm;
   if (rssi_dec >= 128) {
-    rssi_dbm = ((int16_t)(rssi_dec - 256) / 2) - rssi_offset;
+    rssi_dbm = ((int16_t) (rssi_dec - 256) / 2) - rssi_offset;
   } else {
     rssi_dbm = (rssi_dec / 2) - rssi_offset;
   }
-  return (int8_t)rssi_dbm;
+  return (int8_t) rssi_dbm;
 }
 
 const char *CC1101::get_name() { return TAG; }

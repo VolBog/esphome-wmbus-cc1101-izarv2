@@ -23,7 +23,7 @@ def transceiver_schema(trx_name, schema):
                         cg.Component,
                     )
                 ),
-                cv.Required(CONF_RESET_PIN): pins.internal_gpio_output_pin_schema,
+                cv.Optional(CONF_RESET_PIN): pins.internal_gpio_output_pin_schema,
                 cv.Required(CONF_DIO1_PIN): pins.internal_gpio_input_pin_schema,
             }
         )
@@ -38,8 +38,9 @@ async def register_transceiver(config):
 
     var = await cg.register_component(cg.new_Pvariable(config[CONF_RADIO_ID]), config)
 
-    reset_pin = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
-    cg.add(var.set_reset_pin(reset_pin))
+    if CONF_RESET_PIN in config:
+        reset_pin = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
+        cg.add(var.set_reset_pin(reset_pin))
 
     dio1_pin = await cg.gpio_pin_expression(config[CONF_DIO1_PIN])
     cg.add(var.set_dio1_pin(dio1_pin))

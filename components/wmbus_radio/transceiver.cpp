@@ -12,6 +12,9 @@ void Transceiver::set_reset_pin(InternalGPIOPin *reset_pin) { this->reset_pin_ =
 void Transceiver::set_dio1_pin(InternalGPIOPin *dio1_pin) { this->dio1_pin_ = dio1_pin; }
 
 void Transceiver::reset() {
+  if (this->reset_pin_ == nullptr) {
+    return;  // No hardware reset pin (e.g. CC1101 uses a software SRES strobe).
+  }
   this->reset_pin_->digital_write(0);
   delay(5);
   this->reset_pin_->digital_write(1);

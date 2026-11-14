@@ -1,0 +1,8 @@
+packages:
+  wmbus: !include common.yaml
+
+wmbus_radio:
+  radio_type: CC1101
+  cs_pin: GPIO16
+  dio1_pin: GPIO17
+  frequency: 868.95MHz
