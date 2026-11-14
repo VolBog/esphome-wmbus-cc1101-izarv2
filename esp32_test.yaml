@@ -1,0 +1,40 @@
+esphome:
+  name: wmbus-esp32-test
+
+esp32:
+  variant: esp32
+  framework:
+    type: esp-idf
+
+external_components:
+  - source: components
+
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+wmbus_common:
+  drivers:
+    - izarv2
+
+wmbus_radio:
+  radio_type: CC1101
+  cs_pin: GPIO16
+  dio1_pin: GPIO17
+  frequency: 868.95MHz
+
+wmbus_meter:
+  - id: water_meter
+    meter_id: "217e4d4f"
+    type: izarv2
+
+sensor:
+  - platform: wmbus_meter
+    id: total_water
+    parent_id: water_meter
+    field: total_m3
+    name: "Water Total"
+
+logger:
+  level: DEBUG

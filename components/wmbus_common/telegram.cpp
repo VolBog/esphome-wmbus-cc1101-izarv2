@@ -192,6 +192,15 @@ std::optional<Ell> Ell::parse(std::span<const uint8_t> frame, size_t at) {
         return {};
       pos += 2;
     }
+  } else if (ci == 0x8C) {
+    // 0x8C carries only the 4-byte ID; MFCT, version and type are absent, and there is no CRC.
+    ell.address = Address{0, id_of(frame.subspan(pos).first<4>()), 0, 0};
+    pos += 4;
+  } else if (ci == 0x8E) {
+    // 0x8E has an 8-byte address (parsed above) and a CRC.
+    if (!payload_crc_ok(frame, pos))
+      return {};
+    pos += 2;
   }
   ell.size = (uint8_t) (pos - at);
   return ell;
